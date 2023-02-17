@@ -1,0 +1,3 @@
+    let itself = function () {
+        return this;
+    };

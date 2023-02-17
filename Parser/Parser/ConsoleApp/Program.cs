@@ -1,2 +1,2 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿string file = File.ReadAllText("D:/School/S4/Low Code/Parser/Code.txt");
+Console.WriteLine(file);
