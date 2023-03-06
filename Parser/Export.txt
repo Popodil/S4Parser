@@ -1,0 +1,80 @@
+[
+  {
+    "type": "Name",
+    "value": "let",
+    "line_nr": 1,
+    "column_nr": 0
+  },
+  {
+    "type": "Name",
+    "value": "itself1",
+    "line_nr": 1,
+    "column_nr": 4
+  },
+  {
+    "type": "Name",
+    "value": "function",
+    "line_nr": 1,
+    "column_nr": 14
+  },
+  {
+    "type": "Name",
+    "value": "let",
+    "line_nr": 2,
+    "column_nr": 4
+  },
+  {
+    "type": "Name",
+    "value": "test",
+    "line_nr": 2,
+    "column_nr": 8
+  },
+  {
+    "type": "Number",
+    "value": 1,
+    "line_nr": 2,
+    "column_nr": 15
+  },
+  {
+    "type": "Name",
+    "value": "let",
+    "line_nr": 3,
+    "column_nr": 4
+  },
+  {
+    "type": "Name",
+    "value": "punc",
+    "line_nr": 3,
+    "column_nr": 8
+  },
+  {
+    "type": "Number",
+    "value": 1,
+    "line_nr": 3,
+    "column_nr": 15
+  },
+  {
+    "type": "Number",
+    "value": 1,
+    "line_nr": 3,
+    "column_nr": 19
+  },
+  {
+    "type": "Name",
+    "value": "return",
+    "line_nr": 4,
+    "column_nr": 4
+  },
+  {
+    "type": "Name",
+    "value": "this",
+    "line_nr": 4,
+    "column_nr": 11
+  },
+  {
+    "type": "Comment",
+    "value": "// Capture Group",
+    "line_nr": 6,
+    "column_nr": 0
+  }
+]
