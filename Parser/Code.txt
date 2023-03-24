@@ -1,5 +1,7 @@
 let itself1 = function () {
-    let test = 1; 
+    //Function to test the parser
+    let test = "test"; 
+    let isTrue = true; 
     let punc = 1 + 1;
     return this;
 };
