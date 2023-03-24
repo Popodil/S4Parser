@@ -26,31 +26,56 @@ namespace Parser
                     Group group2 = match.Groups[2];
                     if (group2.ToString() != "" && group2.ToString() != null)
                     {
-                        tokens.Add(new Token("Comment", group2.ToString(), i + 1, group2.Index));
+                        tokens.Add(new Token() { 
+                            Type = "Comment", 
+                            Value = group2.ToString(), 
+                            LineNumber = i + 1, 
+                            ColumnNumber = group2.Index 
+                        });
                     }
 
                     Group group3 = match.Groups[3];
                     if (group3.ToString() != "" && group3.ToString() != null)
                     {
-                        tokens.Add(new Token("Name", group3.ToString(), i + 1, group3.Index));
+                        tokens.Add(new Token() { 
+                            Type = "Name", 
+                            Value = group3.ToString(), 
+                            LineNumber = i + 1, 
+                            ColumnNumber = group3.Index 
+                        });
                     }
 
                     Group group4 = match.Groups[4];
                     if (group4.ToString() != "" && group4.ToString() != null)
                     {
-                        tokens.Add(new Token("Number", group4.ToString(), i + 1, group4.Index));
+                        tokens.Add(new Token() { 
+                            Type = "Number", 
+                            Value = group4.ToString(), 
+                            LineNumber = i + 1, 
+                            ColumnNumber = group4.Index 
+                        });
                     }
 
                     Group group5 = match.Groups[5];
                     if (group5.ToString() != "" && group5.ToString() != null)
                     {
-                        tokens.Add(new Token("String", group5.ToString(), i + 1, group5.Index));
+                        tokens.Add(new Token() { 
+                            Type = "String", 
+                            Value = group5.ToString(), 
+                            LineNumber = i + 1, 
+                            ColumnNumber = group5.Index 
+                        });
                     }
 
                     Group group6 = match.Groups[6];
                     if (group6.ToString() != "" && group6.ToString() != null)
                     {
-                        tokens.Add(new Token("Punctuator", group6.ToString(), i + 1, group6.Index));
+                        tokens.Add(new Token() { 
+                            Type = "Punctuator", 
+                            Value = group6.ToString(), 
+                            LineNumber = i + 1,
+                            ColumnNumber = group6.Index 
+                        });
                     }
                 }
             }
