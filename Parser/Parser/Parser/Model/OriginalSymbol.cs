@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Parser
 {
-    public class OriginalSymbol
+    public abstract class OriginalSymbol
     {
         public object First { get; set; }
         public object Second { get; set; }
         public object Arity { get; set; }
+        public object Nud { get; private set; }
 
         public object LeftDenotation(object left)
         {
@@ -18,9 +19,10 @@ namespace Parser
             return this;
         }
 
-        public object NullDenotation()
+        public object NullDenotation(object obj)
         {
-            throw new NotImplementedException();
+            Nud = obj;
+            return Nud;
         }
     }
 }

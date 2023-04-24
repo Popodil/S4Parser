@@ -1,36 +1,42 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Parser.Functions;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Parser
 {
     // Based on: https://crockford.com/javascript/tdop/tdop.html
     public class Parse
     {
-        //private List<Token> tokens = new();
-        private Dictionary<string, int> symbols = new();
+        public static Parse instance;
+
+        public Parse() 
+        { 
+            instance = this; 
+        }
+        public static Dictionary<string, Token> symbolTable = new();
         /// <summary>
-        /// Turns a list of tokens into a parsed JSON string
+        /// Turns a list of tokens into a parsed JSON string using JValue.Parse
         /// </summary>
         /// <param name="tokens"></param>
         /// <returns>Finalised JSON string</returns>
-        public string MakeJSON(List<Token> tokens)
+        public static string MakeJSON(List<Token> tokens)
         {
             return JValue.Parse(JsonConvert.SerializeObject(tokens)).ToString(Formatting.Indented);
         }
 
-        public void MakeParse(List<Token> tokens)
+        /// <summary>
+        /// Turns a list of tokens into a parsed JSON string using custom parser
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <exception cref="Exception">Finalised JSON string</exception>
+        public static void MakeParse(List<Token> tokens)
         {
             object scope;
-            Dictionary<string, Token> symbolTable = new Dictionary<string, Token>();
             Token token;
             int tokenNumber;
-
-            object Itself()
-            {
-                return this;
-            }
 
             void OriginalScope()
             {
@@ -58,7 +64,7 @@ namespace Parser
                 if (tokenNumber >= tokens.Count)
                 {
                     token = symbolTable["(end)"];
-                    // return;
+                    // TODO return;
                 }
 
                 t = tokens[tokenNumber];
@@ -68,7 +74,7 @@ namespace Parser
 
                 if (a == "name")
                 {
-                    // Todo o = scope.Find(v)
+                    //TODO o = scope.Find(v)
                 }
                 else if (a == "punctuator")
                 {
@@ -95,7 +101,7 @@ namespace Parser
                     Value = v,
                     Arity = a
                 };
-                // Return token
+                //TODO Return token
             }
 
             object Expression(int RightBindingPower)
@@ -103,7 +109,7 @@ namespace Parser
                 object left;
                 Token t = token;
                 Advance();
-                left = t.NullDenotation();
+                left = t.Nud;
                 while (RightBindingPower < token.LeftBindingPower)
                 {
                     t = token;
@@ -121,10 +127,10 @@ namespace Parser
                 if (n.StatementDenotation != null)
                 {
                     Advance();
-                    //scope.reserve(n);
+                    //TODO scope.reserve(n);
                     return n.StatementDenotation;
                 }
-                v = (Token)Expression(0); //Todo cast klopt mogelijk niet
+                v = (Token)Expression(0); //TODO cast klopt mogelijk niet
                 if (!v.Assignment && v.Id != "(")
                 {
                     throw new Exception("Bad expression statement.");
@@ -163,10 +169,9 @@ namespace Parser
             Token Symbol(object id, int bindingPower = 0)
             {
                 Token s = null;
-                if (symbolTable.ContainsKey(id.ToString())) s = symbolTable[id.ToString()];
-
-                if (s != null)
+                if (symbolTable.ContainsKey(id.ToString()))
                 {
+                    s = symbolTable[id.ToString()];
                     if (bindingPower >= s.LeftBindingPower)
                     {
                         s.LeftBindingPower = bindingPower;
@@ -186,7 +191,7 @@ namespace Parser
             Token Constant(object s, object v)
             {
                 Token x = Symbol(s);
-                // TODO scope.reserve(this);
+                //TODO scope.reserve(this);
                 x.Arity = "literal";
                 x.Value = v;
                 return x;
@@ -220,7 +225,7 @@ namespace Parser
             object Prefix(string id, object nud)
             {
                 Token s = Symbol(id);
-                //Todo scope.reserve(this)
+                //TODO scope.reserve(this)
                 s.Arity = "unary";
                 s.First = Expression(70);
 
@@ -234,34 +239,41 @@ namespace Parser
                 return x;
             }
 
-            Symbol("(end)");
-            Symbol("(name)");
-            Symbol(":");
-            Symbol(";");
-            Symbol(")");
-            Symbol("]");
-            Symbol("}");
-            Symbol(",");
-            Symbol("else");
+            void Initialise()
+            {
+                new Functions.Symbol("(end)");
+                new Functions.Symbol("(name)");
+                new Functions.Symbol(":");
+                new Functions.Symbol(";");
+                new Functions.Symbol(")");
+                new Functions.Symbol("]");
+                new Functions.Symbol("}");
+                new Functions.Symbol(",");
+                new Functions.Symbol("else");
 
-            Constant("true", true);
-            Constant("false", false);
-            Constant("null", null);
-            Constant("pi", 3.141592653589793);
-            //Constant("Object", new object obj);
-            //Constant("Array", new List<object> list);
+                new Constant("true", true);
+                new Constant("false", false);
+                new Constant("null", null);
+                new Constant("pi", 3.141592653589793);
+                new Constant("Object", new object());
+                new Constant("Array", new List<object>());
 
-            //Symbol("(literal)").NullDenotation = Itself();
+                new Functions.Symbol("(literal)").NullDenotation(instance);
 
-            /*Symbol("this").NullDenotation = function() {
-                scope.reserve(this);
-                this.arity = "this";
-                return this;
-            };*/
+                new Functions.Symbol("this") { 
+                    //TODO scope.reserve(this);
+                    Arity = "this"
+                };
 
-            /*Assignment("=");
-            Assignment("+=");
-            Assignment("-=");*/
+                //new Assignment("=") { Second = Expression(9) };
+                //new Assignment("+=") { Second = Expression(9) };
+                //new Assignment("-=") { Second = Expression(9) };
+
+
+
+                new InfixR("&&", 30);
+            }
+            Initialise(); 
         }
     }
 }
