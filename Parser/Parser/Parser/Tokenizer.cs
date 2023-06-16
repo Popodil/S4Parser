@@ -7,7 +7,7 @@ namespace Parser
     {
         private List<Token> tokens;
         private readonly string rx_crlf = "\n|\r\n|\r";
-        private readonly string rx_token = "(\\u0020+)|(\\/\\/.*)|([a-zA-Z][a-zA-Z_0-9]*)|(\\d+(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?)|(\"(?:[^\"\\\\]|\\\\(?:[nr\"\\\\]|u[0-9a-fA-F]{4}))*\")|([(){}\\[\\]?.,:;~*\\/]|&&?|\\|\\|?|[+\\-<>]=?|[!=](?:==)?)|({})/y";
+        private readonly string rx_token = "(\\\\u0020+)|(\\/\\/[^\\n]*)|([a-zA-Z][a-zA-Z_0-9]*)|(\\d+(?:\\.\\d+)?(?:[eE][+\\-]?\\d+)?)|(\"(?:[^\"\\\\]|\\\\(?:[nr\"\\\\]|u[0-9a-fA-F]{4}))*\")|([(){}\\[\\]?.,:;~*\\/]|&&?|\\|\\|?|[+\\-<>]=?|[!=](?:==)?)|({})";
         public List<Token> ConvertTokens(string InputString)
         {
             tokens = new();
