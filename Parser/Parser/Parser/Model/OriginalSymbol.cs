@@ -11,18 +11,5 @@ namespace Parser
         public object First { get; set; }
         public object Second { get; set; }
         public object Arity { get; set; }
-        public object Nud { get; private set; }
-
-        public object LeftDenotation(object left)
-        {
-            First = left;
-            return this;
-        }
-
-        public object NullDenotation(object obj)
-        {
-            Nud = obj;
-            return Nud;
-        }
     }
 }

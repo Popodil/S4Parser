@@ -1,0 +1,174 @@
+[
+  {
+    "token": {
+      "Value": "=",
+      "LineNumber": 1,
+      "ColumnNumber": 9,
+      "TokenType": 3,
+      "Id": "=",
+      "LeftBindingPower": 10,
+      "Assignment": false,
+      "SymbolType": 0,
+      "SecondType": null,
+      "First": null,
+      "Second": null,
+      "Arity": null
+    },
+    "First": {
+      "token": {
+        "Value": "punc",
+        "LineNumber": 1,
+        "ColumnNumber": 4,
+        "TokenType": 4,
+        "Id": "punc",
+        "LeftBindingPower": 0,
+        "Assignment": false,
+        "SymbolType": 0,
+        "SecondType": null,
+        "First": null,
+        "Second": null,
+        "Arity": null
+      },
+      "First": null,
+      "Second": null
+    },
+    "Second": {
+      "token": {
+        "Value": "+",
+        "LineNumber": 1,
+        "ColumnNumber": 13,
+        "TokenType": 3,
+        "Id": "+",
+        "LeftBindingPower": 50,
+        "Assignment": false,
+        "SymbolType": 0,
+        "SecondType": null,
+        "First": null,
+        "Second": null,
+        "Arity": null
+      },
+      "First": {
+        "token": {
+          "Value": 1.0,
+          "LineNumber": 1,
+          "ColumnNumber": 11,
+          "TokenType": 1,
+          "Id": "1",
+          "LeftBindingPower": 0,
+          "Assignment": false,
+          "SymbolType": 0,
+          "SecondType": null,
+          "First": null,
+          "Second": null,
+          "Arity": null
+        },
+        "First": null,
+        "Second": null
+      },
+      "Second": {
+        "token": {
+          "Value": 3.0,
+          "LineNumber": 1,
+          "ColumnNumber": 15,
+          "TokenType": 1,
+          "Id": "3",
+          "LeftBindingPower": 0,
+          "Assignment": false,
+          "SymbolType": 0,
+          "SecondType": null,
+          "First": null,
+          "Second": null,
+          "Arity": null
+        },
+        "First": null,
+        "Second": null
+      }
+    }
+  },
+  {
+    "token": {
+      "Value": "=",
+      "LineNumber": 2,
+      "ColumnNumber": 9,
+      "TokenType": 3,
+      "Id": "=",
+      "LeftBindingPower": 10,
+      "Assignment": false,
+      "SymbolType": 0,
+      "SecondType": null,
+      "First": null,
+      "Second": null,
+      "Arity": null
+    },
+    "First": {
+      "token": {
+        "Value": "punc",
+        "LineNumber": 2,
+        "ColumnNumber": 4,
+        "TokenType": 4,
+        "Id": "punc",
+        "LeftBindingPower": 0,
+        "Assignment": false,
+        "SymbolType": 0,
+        "SecondType": null,
+        "First": null,
+        "Second": null,
+        "Arity": null
+      },
+      "First": null,
+      "Second": null
+    },
+    "Second": {
+      "token": {
+        "Value": "+",
+        "LineNumber": 2,
+        "ColumnNumber": 16,
+        "TokenType": 3,
+        "Id": "+",
+        "LeftBindingPower": 50,
+        "Assignment": false,
+        "SymbolType": 0,
+        "SecondType": null,
+        "First": null,
+        "Second": null,
+        "Arity": null
+      },
+      "First": {
+        "token": {
+          "Value": "punc",
+          "LineNumber": 2,
+          "ColumnNumber": 11,
+          "TokenType": 4,
+          "Id": "punc",
+          "LeftBindingPower": 0,
+          "Assignment": false,
+          "SymbolType": 0,
+          "SecondType": null,
+          "First": null,
+          "Second": null,
+          "Arity": null
+        },
+        "First": null,
+        "Second": null
+      },
+      "Second": {
+        "token": {
+          "Value": 1.0,
+          "LineNumber": 2,
+          "ColumnNumber": 18,
+          "TokenType": 1,
+          "Id": "1",
+          "LeftBindingPower": 0,
+          "Assignment": false,
+          "SymbolType": 0,
+          "SecondType": null,
+          "First": null,
+          "Second": null,
+          "Arity": null
+        },
+        "First": null,
+        "Second": null
+      }
+    }
+  }
+]

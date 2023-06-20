@@ -6,26 +6,18 @@ using System.Threading.Tasks;
 
 namespace Parser.Functions
 {
-    public class InfixR : Base
+    public class InfixR
     {
-        public InfixR(string id, int bindingPower, object led = null)
+        private Parse parse;
+        public InfixR(Parse parse)
         {
-            if (Parse.symbolTable.ContainsKey(id))
-            {
-                if (Parse.symbolTable[id].LeftBindingPower >= bindingPower)
-                {
-                    Parse.symbolTable[id].LeftBindingPower = bindingPower;
-                }
-            }
-            else
-            {
-                Parse.symbolTable.Add(id, new Token()
-                {
-                    Id = id,
-                    Value = id,
-                    LeftBindingPower = bindingPower
-                }) ;
-            }
+            this.parse = parse;
+        }
+        public Base Led(Base first, Base main)
+        {
+            Base Second = parse.Expression(main.token.LeftBindingPower - 1) ?? throw new Exception("Couldn't get second");
+            main.AddBase(first, Second);
+            return main;
         }
     }
 }

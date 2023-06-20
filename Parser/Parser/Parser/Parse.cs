@@ -10,19 +10,76 @@ namespace Parser
     // Based on: https://crockford.com/javascript/tdop/tdop.html
     public class Parse
     {
-        public static Parse instance;
+        public Token token;
+        public Tree tree = new();
+        public Dictionary<string, Symbol> symbolTable;
+        public List<Token> tokens;
+        public int tokenIndex = 0;
+        public Base temp;
+        public Prefix prefix;
+        public InfixR infixr;
+        public Infix infix;
+        public Statement statement;
+        private bool end = false;
 
-        public Parse() 
-        { 
-            instance = this; 
+        public Parse()
+        {
+            prefix = new(this);
+            infixr = new(this);
+            infix = new(this);
+            statement = new(this);
+            symbolTable = new();
+            Initialise();
         }
-        public static Dictionary<string, Token> symbolTable = new();
+
+        private void Initialise()
+        {
+            JObject OperatorPrecedence = JObject.Parse(File.ReadAllText(@"D:\School\S4\Low Code\Parser\Initialise.json"));
+            if (OperatorPrecedence == null)
+            {
+                throw (new Exception("json empty or unable to read"));
+            }
+            foreach (string Key in OperatorPrecedence.Properties().Select(p => p.Name).ToList())
+            {
+                SymbolType type = CheckSymbolType(Key);
+                foreach (JProperty symbol in OperatorPrecedence[Key])
+                {
+                    Symbol s = new(symbol.Name, type, Convert.ToInt32(symbol.Value));
+                    if (!symbolTable.ContainsKey(symbol.Name))
+                        symbolTable.Add(symbol.Name, s);
+                }
+            }
+
+            SymbolType CheckSymbolType(string type)
+            {
+                SymbolType symbolType = type switch
+                {
+                    "infix" => SymbolType.infix,
+                    "infixr" => SymbolType.infixR,
+                    "prefix" => SymbolType.prefix,
+                    "assignement" => SymbolType.assignment,
+                    "statement" => SymbolType.statement,
+                    _ => SymbolType.symbol,
+                };
+                return symbolType;
+            }
+            Symbol sym = new("(", SymbolType.infix, 80, SymbolType.prefix);
+            if (!symbolTable.ContainsKey(sym.Id))
+                symbolTable.Add("(", sym);
+            sym = new("[", SymbolType.infix, 0, SymbolType.prefix);
+            if (!symbolTable.ContainsKey(sym.Id))
+                symbolTable.Add("[", sym);
+            sym = new("{", SymbolType.prefix, 0, SymbolType.statement);
+            if (!symbolTable.ContainsKey(sym.Id))
+                symbolTable.Add("{", sym);
+        }
+
         /// <summary>
         /// Turns a list of tokens into a parsed JSON string using JValue.Parse
         /// </summary>
         /// <param name="tokens"></param>
         /// <returns>Finalised JSON string</returns>
-        public static string MakeJSON(List<Token> tokens)
+        public string MakeJSON(List<Token> tokens)
         {
             return JValue.Parse(JsonConvert.SerializeObject(tokens)).ToString(Formatting.Indented);
         }
@@ -32,248 +89,132 @@ namespace Parser
         /// </summary>
         /// <param name="tokens"></param>
         /// <exception cref="Exception">Finalised JSON string</exception>
-        public static void MakeParse(List<Token> tokens)
+        public Parse MakeParse(List<Token> tokens)
         {
-            object scope;
-            Token token;
-            int tokenNumber;
+            this.tokens = tokens;
+            Advance();
+            Statements();
+            return this;
+        }
 
-            void OriginalScope()
+        public void Advance(string? value = null)
+        {
+            if (tokenIndex == tokens.Count)
             {
-
+                end = true;
+                return;
             }
 
-            void NewScope(int id)
+            //TODO fix "(" with expected ";"
+            if (value != null)
             {
+                if (value != token.Id)
+                {
+                    throw new Exception($"Expected: {value}");
+                }
+            }
 
+            token = tokens[tokenIndex];
+            tokenIndex++;
+
+            if (token.TokenType == TokenType.Name)
+            {
+                Symbol? name = symbolTable["(name)"];
+                if (name == null)
+                {
+                    throw new Exception("(name) symbol not found");
+                }
+                token.SetSymbol(name);
+            }
+            else if (token.TokenType == TokenType.Operator)
+            {
+                Symbol? Operator = symbolTable[token.Id];
+                if (Operator == null)
+                {
+                    throw new Exception("Unkown operator");
+                }
+                token.SetSymbol(Operator);
+            }
+            else if (token.TokenType == TokenType.String || token.TokenType == TokenType.Number)
+            {
+                Symbol? literal = symbolTable["(literal)"];
+                if (literal == null)
+                {
+                    throw new Exception("(literal) symbol not found");
+                }
+                token.SetSymbol(literal);
+            }
+            else if (token.Id == "(end)")
+            {
+                return;
+            }
+            else
+            {
+                throw new Exception("Unknown token");
             }
 
 
+        }
 
-            void Advance(string id = null)
+        public Base Expression(int rightBindingPower)
+        {
+            Token t = token;
+            Advance();
+            Base previousBase = new(t);
+            if (t.SymbolType == SymbolType.prefix || t.SecondType == SymbolType.prefix)
             {
-                string a;
-                object o;
-                Token t;
-                object v;
-
-                if (string.IsNullOrEmpty(id) && !string.Equals(token.Id, id))
-                {
-                    throw new Exception("Expected '" + id + "'.");
-                }
-                if (tokenNumber >= tokens.Count)
-                {
-                    token = symbolTable["(end)"];
-                    // TODO return;
-                }
-
-                t = tokens[tokenNumber];
-                tokenNumber++;
-                v = t.Value;
-                a = t.Type;
-
-                if (a == "name")
-                {
-                    //TODO o = scope.Find(v)
-                }
-                else if (a == "punctuator")
-                {
-                    o = symbolTable[v.ToString()];
-                    if (o == null)
-                    {
-                        throw new Exception("Unknown operator.");
-                    }
-                }
-                else if (a == "string" || a == "number")
-                {
-                    o = symbolTable["(literal)"];
-                    a = "literal";
-                }
-                else
-                {
-                    throw new Exception("Unexpected token.");
-                }
-
-                token = new Token
-                {
-                    LineNumber = t.LineNumber,
-                    ColumnNumber = t.ColumnNumber,
-                    Value = v,
-                    Arity = a
-                };
-                //TODO Return token
+                previousBase = Nud(new(token), previousBase);
             }
-
-            object Expression(int RightBindingPower)
+            while (rightBindingPower < token.LeftBindingPower)
             {
-                object left;
-                Token t = token;
+                t = token;
                 Advance();
-                left = t.Nud;
-                while (RightBindingPower < token.LeftBindingPower)
-                {
-                    t = token;
-                    Advance();
-                    left = t.LeftDenotation(left);
-                }
-                return left;
+                previousBase = Led(previousBase, new(t));
             }
+            return previousBase;
+        }
 
-            object Statement()
+        private void Sentence()
+        {
+            if (token.Id == "let")
             {
-                Token n = token;
-                Token v;
-
-                if (n.StatementDenotation != null)
-                {
-                    Advance();
-                    //TODO scope.reserve(n);
-                    return n.StatementDenotation;
-                }
-                v = (Token)Expression(0); //TODO cast klopt mogelijk niet
-                if (!v.Assignment && v.Id != "(")
-                {
-                    throw new Exception("Bad expression statement.");
-                }
-                Advance(";");
-                return v;
+                Token T = token;
+                Advance();
+                temp = statement.StatementFunc(new(token), new(T));
+                tree.AddBase(temp);
+                return;
             }
+            Expression(0);
+            tree.AddBase(temp);
+            Advance(";");
+        }
 
-            List<object> Statements()
+        private Base Led(Base First, Base main)
+        {
+            switch (main.token.SymbolType)
             {
-                List<object> a = new List<object>();
-                object s;
-
-                while (true)
-                {
-                    if (token.Id == "}" || token.Id == "(end)")
-                    {
-                        break;
-                    }
-                    s = Statement();
-                    if (s != null)
-                    {
-                        a.Add(s);
-                    }
-                }
-                return a;
+                case SymbolType.infix:
+                    temp = infix.Led(First, main);
+                    break;
+                case SymbolType.infixR:
+                    temp = infixr.Led(First, main);
+                    break;
+                default:
+                    throw new Exception("Incorrect symbol");
             }
-
-            object Block()
+            return temp;
+        }
+        private Base Nud(Base First, Base Base)
+        {
+            temp = prefix.Nud(First, Base);
+            return temp;
+        }
+        private void Statements()
+        {
+            while (!end)
             {
-                Token t = token;
-                Advance("{");
-                return t.StatementDenotation;
+                Sentence();
             }
-
-            Token Symbol(object id, int bindingPower = 0)
-            {
-                Token s = null;
-                if (symbolTable.ContainsKey(id.ToString()))
-                {
-                    s = symbolTable[id.ToString()];
-                    if (bindingPower >= s.LeftBindingPower)
-                    {
-                        s.LeftBindingPower = bindingPower;
-                    }
-                }
-                else
-                {
-                    s = new Token();
-                    s.Id = id.ToString();
-                    s.Value = id;
-                    s.LeftBindingPower = bindingPower;
-                    symbolTable.Add(id.ToString(), s);
-                }
-                return s;
-            }
-
-            Token Constant(object s, object v)
-            {
-                Token x = Symbol(s);
-                //TODO scope.reserve(this);
-                x.Arity = "literal";
-                x.Value = v;
-                return x;
-            }
-
-            Token Infix(string id, int bindingPower, object led)
-            {
-                Token s = Symbol(id, bindingPower);
-                s.Second = Expression(bindingPower);
-                s.Arity = "binary";
-                return s;
-            }
-
-            Token Infixr(string id, int bindingPower, object led)
-            {
-                Token s = Symbol(id, bindingPower);
-                s.Second = Expression(bindingPower - 1);
-                s.Arity = "binary";
-                return s;
-            }
-
-            Token Assignment(string id)
-            {
-                Token s = Symbol(id, 10);
-                s.Second = Expression(9);
-                s.Assignment = true;
-                s.Arity = "binary";
-                return s;
-            }
-
-            object Prefix(string id, object nud)
-            {
-                Token s = Symbol(id);
-                //TODO scope.reserve(this)
-                s.Arity = "unary";
-                s.First = Expression(70);
-
-                return s;
-            }
-
-            Token Stmt(object s, object f)
-            {
-                Token x = Symbol(s);
-                x.StatementDenotation = f;
-                return x;
-            }
-
-            void Initialise()
-            {
-                new Functions.Symbol("(end)");
-                new Functions.Symbol("(name)");
-                new Functions.Symbol(":");
-                new Functions.Symbol(";");
-                new Functions.Symbol(")");
-                new Functions.Symbol("]");
-                new Functions.Symbol("}");
-                new Functions.Symbol(",");
-                new Functions.Symbol("else");
-
-                new Constant("true", true);
-                new Constant("false", false);
-                new Constant("null", null);
-                new Constant("pi", 3.141592653589793);
-                new Constant("Object", new object());
-                new Constant("Array", new List<object>());
-
-                new Functions.Symbol("(literal)").NullDenotation(instance);
-
-                new Functions.Symbol("this") { 
-                    //TODO scope.reserve(this);
-                    Arity = "this"
-                };
-
-                //new Assignment("=") { Second = Expression(9) };
-                //new Assignment("+=") { Second = Expression(9) };
-                //new Assignment("-=") { Second = Expression(9) };
-
-
-
-                new InfixR("&&", 30);
-            }
-            Initialise(); 
         }
     }
 }
